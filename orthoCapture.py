@@ -395,7 +395,7 @@ def tblastx(name,querycsv,query,genome):
 def recBlast(fasta,gn,name,genome):
         if ntloc="NONE":
                 sys.exit("You didn't specify the location of your nucleotide database. Run prep_directory.sh <ntdb location> and try again from the recblast step.")
-        elif !os.path.isdir(ntloc):
+        elif not os.path.isdir(ntloc):
                 sys.exit("The file you specified for the location of your nucleotide database doesn't exist. Check the path and run ntdb_location.sh <ntdb location> and try again from the recblast step.")
         else:
                 for x in range(len(fasta[gn])): # for each instance of that gene
@@ -464,7 +464,7 @@ def main():
         # Define ntloc
         ntloc = '/test/test/path'
         if skip == "noskip":
-                if !os.path.isdir(name):
+                if not os.path.isdir(name):
                         os.makedirs(name) # make a directory for all of the files
                 else:
                         print(name+" directory already exists")
@@ -484,7 +484,7 @@ def main():
                 for i in aligned:
                         extend(name, i, querycsv, genome)
         if skip == "tblastx":
-                if !os.path.isdir(name):
+                if not os.path.isdir(name):
                         os.makedirs(name) # make a directory for all of the files
                 else:
                         print(name+" directory already exists")
