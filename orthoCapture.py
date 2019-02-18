@@ -379,7 +379,7 @@ def tblastx(name,querycsv,query,genome):
                csv_to_fasta(querycsv,query)
         tblastx_command_line = 'ncbi-blast-2.2.29+/bin/tblastx -query '+query+' -db '+genome+' -culling_limit 1 -out '+name+'/'+name+'_tblastx.out -outfmt "6 qseqid qstart qend sstart send qcovhsp bitscore sacc" -max_target_seqs 1'
                 # using ncbi blast version 2.2.29 so sseq outputs nucleotide sequence (2.6.* outputs protein sequence)
-        print("tblastx command line:)
+        print("tblastx command line")
         print(tblastx_command_line)
         subprocess.Popen(tblastx_command_line, shell=True).wait() # shell because of argument in quotes, wait so script doesn't advance until done
                 # will output file [name]_tblastx.out
