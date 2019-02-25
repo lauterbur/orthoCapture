@@ -392,7 +392,7 @@ def tblastx(name,querycsv,query,genome):
         with open(name+'/'+name+'_fasta_tblastx.pickle', 'wb') as handle:
                 pickle.dump(fasta, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-def recBlast(fasta,gn,name,genome):
+def recBlast(fasta,gn,name,genome,ntloc):
         if ntloc=="NONE":
                 sys.exit("You didn't specify the location of your nucleotide database. Run prep_directory.sh <ntdb location> and try again from the recblast step.")
         elif not os.path.isdir(ntloc):
@@ -469,7 +469,7 @@ def main():
                 else:
                         print(name+" directory already exists")
                 tblastx(name,querycsv,query,genome)
-                par_recBlast(name,genome)
+                par_recBlast(name,genome,ntloc)
                 par_blastMatch(name,querycsv)
                 collapse(name,querycsv)
                 with open(name+"/"+name+"_amended.out","r") as am:
@@ -492,7 +492,7 @@ def main():
                 print("tblastx step complete. go to recblast.")
                 sys.exit("tblastx step complete. go to recblast.")
         if skip == "recblast":
-                par_recBlast(name,genome)
+                par_recBlast(name,genome,ntloc)
                 print("recblast step complete. go to blastmatch.")
                 sys.exit("recblast step complete. go to blastmatch.")
                 par_blastMatch(name,querycsv)
