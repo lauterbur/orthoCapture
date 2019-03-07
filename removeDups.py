@@ -79,17 +79,22 @@ def extend(uniques, contigID, k = 30): # if there's k (default = 30) characters 
 #       k=5
         sequences = [s for h,s in uniques] # this shld be a dictionary with headers as keys
         headers = [h for h,s in uniques]
-        for a,b in itertools.combinations(sequences,2):
-                heada = headers[sequences.index(a)] # header a
-                headb = headers[sequences.index(b)] # header b
-                if len(a) > k and len(b) > k and "-" in heada and "-" in headb: # if both sequences are longer than k and neither is the reference
-                        match = difflib.SequenceMatcher(None,a,b).find_longest_match(0,len(a),0,len(b))
-#                       print(a)
-#                       print(b)
-                        print(match)
-                        heada = headers[sequences.index(a)] # header a
-                        headb = headers[sequences.index(b)] # header b
-                        print(heada)
+        #for a,b in itertools.combinations(sequences,2):
+        #        heada = headers[sequences.index(a)] # header a
+        #        headb = headers[sequences.index(b)] # header b
+        for a,b in itertools.combinations(headers,2):
+                heada = a
+                headb = b
+                seqa = sequences[headers.index(a)]
+                seqb = sequences[headers.index(b)]
+                if len(seqa) > k and len(seqb) > k and "-" in heada and "-" in headb: # if both sequences are longer than k and neither is the reference
+                        match = difflib.SequenceMatcher(None,seqa,seqb).find_longest_match(0,len(seqa),0,len(seqb))
+                        #print(seqa)
+                        #print(seqb)
+                        #print(match)        
+                        #heada = headers[sequences.index(a)] # header a
+                        #headb = headers[sequences.index(b)] # header b
+                        #print(heada)
                         first_locations = [s.split("-") for s in heada.split("_") if "-" in s][0]
                         print(first_locations)
                         first_start = min(first_locations)
