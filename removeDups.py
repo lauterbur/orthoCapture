@@ -64,7 +64,11 @@ def is_dup(sequences,headers,contigID):
         print(sequences)
         print("HERE")
         if len(sequences) > 0:
-                uniques.append((headers[-1],sequences[-1])) # save last sequence
+                #uniques.append((headers[-1],sequences[-1])) # save last sequence
+                nonreference=[i for i,s in enumerate(headers[::-1]) if "reference" in s][-1]+1
+                # get first header of reversed list of headers that isn't a reference sequence
+                        # get first header of reversed list of headers that isn't a reference sequence
+                uniques.append((headers[::-1][nonreference],sequences[::-1][nonreference]))
         else:
                 print("no sequences to append")
         return(uniques)
