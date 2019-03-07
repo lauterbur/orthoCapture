@@ -105,8 +105,8 @@ def extend(uniques, contigID, k = 30): # if there's k (default = 30) characters 
                         second_start = min(second_locations)
                         second_stop = max(second_locations)
                         if second_start > first_stop and first_start < second_stop: # if they don't overlap (ie from different places on contig)
-                                extended.append((headers[sequences.index(a)],a)) # save both separately
-                                extended.append((headers[sequences.index(b)],b))
+                                extended.append((heada,seqa)) # save both separately
+                                extended.append((headb,seqb))
                                 print("overlap but on different regions of contig, don't merge")
                         elif match[0] >= match[1] == 0 and match[2] > k: # if sequence a is first and overlap > k is at beginning of sequence b; or if they are perfect overlap
                                 # if need contigs to match
@@ -114,57 +114,57 @@ def extend(uniques, contigID, k = 30): # if there's k (default = 30) characters 
                                 # if on same contig, save
                                 # if not on same contig, save individually
                                 if contigID == "yes": # if need to be on same contig
-                                        heada = headers[sequences.index(a)] # header a
-                                        headb = headers[sequences.index(b)] # header b
+                                        #heada = headers[sequences.index(a)] # header a
+                                        #headb = headers[sequences.index(b)] # header b
 #                                        print(heada)
 #                                        print(headb)
                                         if heada.split("_")[-1] == headb.split("_")[-1]: # if on same contig
-                                                merge = a[:match[0]]+b # add b to first part of sequence a
-                                                extended.append((headers[sequences.index(a)]+"_"+headers[sequences.index(b)],merge)) # and save, with header of first sequence
-                                                print("extended "+headers[sequences.index(a)])
+                                                merge = seqa[:match[0]]+seqb # add b to first part of sequence a
+                                                extended.append((heada+"_"+headb,merge)) # and save, with header of first sequence
+                                                #print("extended "+heada)
                                         else:
-                                                extended.append((headers[sequences.index(a)],a))
-                                                extended.append((headers[sequences.index(b)],b)) 
+                                                extended.append((heada,seqa))
+                                                extended.append((headb,seqb))  
                                                 print("overlap but on different contigs, don't merge")
                                                 print(heada.split("_")[-1]+"\t"+headb.split("_")[-1])
                                                 pass
                                 else: # if don't need to check if they're on the same contig
-        #                               print(a[:match[0]])
-                                        merge = a[:match[0]]+b # add b to first part of sequence a
-                                        extended.append((headers[sequences.index(a)]+"_"+headers[sequences.index(b)],merge)) # and save, with header of first sequence
-                                        print("extended "+headers[sequences.index(a)])
+        #                               #print(seqa[:match[0]])
+                                        merge = seqa[:match[0]]+seqb # add b to first part of sequence a
+                                        extended.append((heada+"_"+headb,merge)) # and save, with header of first sequence
+                                        #print("extended "+heada)
                         elif match[1] >= match[0]==0 and match[2] > k: # if sequence b is first and overlap > k is at beginning of sequence a
                                 if contigID == "yes":
-                                        heada = headers[sequences.index(a)] # header a
-                                        headb = headers[sequences.index(b)] # header b
+                                        #heada = headers[sequences.index(a)] # header a
+                                        #headb = headers[sequences.index(b)] # header b
                                         if heada.split("_")[-1] == headb.split("_")[-1]: # if on same contig
-                                                merge = b[:match[1]]+a # add a to first part of sequence b
-                                                extended.append((headers[sequences.index(b)]+"_"+headers[sequences.index(a)],merge)) # and save, with header of first sequence
-                                                print("extended "+headers[sequences.index(b)])
+                                                merge = seqb[:match[1]]+seqa # add a to first part of sequence b
+                                                extended.append((headb+"_"+heada,merge)) # and save, with header of first sequence
+                                                #print("extended "+headb)
                                         else:
                                                 print("overlap but on different contigs, don't merge")
                                                 print(heada.split("_")[-1]+"\t"+headb.split("_")[-1])
                                                 pass
                                 else:
-        #                               print(b[:match[0]])
-                                        merge = b[:match[1]]+a # add a to first part of sequence b
-                                        extended.append((headers[sequences.index(b)]+"_"+headers[sequences.index(a)],merge)) # and save, with header of first sequence
-                                        print("extended "+headers[sequences.index(b)])
+        #                               print(seqb[:match[0]])
+                                        merge = seqb[:match[1]]+seqa # add a to first part of sequence b
+                                        extended.append((headb+"_"+heada,merge)) # and save, with header of first sequence
+                                        #print("extended "+headb)
                         elif match[2] < k: # if no match longer than k
-                                extended.append((headers[sequences.index(a)],a))
-                                print("saved "+headers[sequences.index(a)])
-                                extended.append((headers[sequences.index(b)],b)) # save both individually
-                                print("saved "+headers[sequences.index(b)])
+                                print("extended "+headb)
+                                #print("saved "+heada)
+                                extended.append((headb,seqb)) # save both individually
+                                #print("saved "+headb)
                         elif match[0] != 0 or match[1] != 0: # if match not at beginning of either sequence
-                                extended.append((headers[sequences.index(a)],a))
-                                print("saved "+headers[sequences.index(a)])
-                                extended.append((headers[sequences.index(b)],b)) # save both individually
-                                print("saved "+headers[sequences.index(b)])
+                                extended.append((heada,seqa))
+                                #print("saved "+heada)
+                                extended.append((headb,seqb)) # save both individually
+                                print("saved "+headb)
                 else: # if one or both sequences are not longer than k
-                        extended.append((headers[sequences.index(a)],a))
-                        print("saved "+headers[sequences.index(a)])
-                        extended.append((headers[sequences.index(b)],b)) # save both individually
-                        print("saved "+headers[sequences.index(b)])
+                        extended.append((heada,seqa))
+                        #print("saved "+heada)
+                        extended.append((headb,seqb)) # save both individually
+                        #print("saved "+headb)
 #        extended_sorted = sorted(extended, key=lambda seq:seq[1])
         extended.sort(key=lambda t: len(t[1]))
         extended_sorted = extended
