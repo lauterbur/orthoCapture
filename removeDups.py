@@ -28,41 +28,40 @@ class Fasta:
 
         def isFasta(self): ## check if it's a fasta file
                 if ">" == self.all_lines[0][0][0]:
-                        print("Fasta file")
+                       # print("Fasta file")
                 else:
                         print("Not a fasta file")
                         sys.exit()
 
 def is_dup(sequences,headers,contigID):
         uniques = []
-        print(len(sequences))
+       # print(len(sequences))
         for i in range(len(sequences)-1):
-                print("Sequence "+str(i)+" matches sequences "+str(i+1)+" - "+str(len(sequences)-1)+"?") 
+               # print("Sequence "+str(i)+" matches sequences "+str(i+1)+" - "+str(len(sequences)-1)+"?") 
                 if sum([sequences[i] in s for s in sequences[i+1:]]) >= 1: # if sequence is in any longer ones
                         if contigID == "yes":
                                 loc = [sequences[i] in s for s in sequences [i+1:]].index(True) # find first sequence it matches
-                                print(headers[i].split("_")[-1]+"\t"+headers[loc].split("_")[-1])
-                                print("in is_dup")
+                               # print(headers[i].split("_")[-1]+"\t"+headers[loc].split("_")[-1])
+                               # print("in is_dup")
                                 if headers[i].split("_")[-1] != headers[loc].split("_")[-1]: # check if contigs match
-                                        print("yes, it's a duplicate, but it's on a different contig, save it")
+                                       # print("yes, it's a duplicate, but it's on a different contig, save it")
                                         uniques.append((headers[i],sequences[i]))
-                                        print(headers[i].split("_")[-1]+"\t"+headers[loc].split("_")[-1])
+                                       # print(headers[i].split("_")[-1]+"\t"+headers[loc].split("_")[-1])
                                 else:
-                                        print("yes, it's a duplicate or partial duplicate, ignore it") # it's a duplicate, so don't save it
+                                      #  print("yes, it's a duplicate or partial duplicate, ignore it") # it's a duplicate, so don't save it
                                         pass
                         else:
-                                print("yes, it's a duplicate or partial duplicate, ignore it") # it's a duplicate, so don't save it
+                               # print("yes, it's a duplicate or partial duplicate, ignore it") # it's a duplicate, so don't save it
                                 pass
                 elif sum([sequences[i] in s for s in sequences[i+1:]]) == 0: # if sequence isn't in any longer ones
-                        print("no, it's unique, save it") # it's unique, so save it
+                       # print("no, it's unique, save it") # it's unique, so save it
                         uniques.append((headers[i],sequences[i]))
                 else: # something's wrong
                         print("something's wrong with checking for duplicates at"+headers)
                         sys.exit()
  #                       print([sequences[i] in s for s in sequences[i+1:]])
-        print(headers)
-        print(sequences)
-        print("HERE")
+       # print(headers)
+       # print(sequences)
         if len(sequences) > 0:
                 #uniques.append((headers[-1],sequences[-1])) # save last sequence
                 nonreference=[i for i,s in enumerate(headers[::-1]) if "reference" in s][-1]+1
@@ -96,18 +95,18 @@ def extend(uniques, contigID, k = 30): # if there's k (default = 30) characters 
                         #headb = headers[sequences.index(b)] # header b
                         #print(heada)
                         first_locations = [s.split("-") for s in heada.split("_") if "-" in s][0]
-                        print(first_locations)
+                       # print(first_locations)
                         first_start = min(first_locations)
                         first_stop = max(first_locations)
-                        print(headb)
+                       # print(headb)
                         second_locations = [s.split("-") for s in headb.split("_") if "-" in s][0]
-                        print(second_locations)
+                       # print(second_locations)
                         second_start = min(second_locations)
                         second_stop = max(second_locations)
                         if second_start > first_stop and first_start < second_stop: # if they don't overlap (ie from different places on contig)
                                 extended.append((heada,seqa)) # save both separately
                                 extended.append((headb,seqb))
-                                print("overlap but on different regions of contig, don't merge")
+                               # print("overlap but on different regions of contig, don't merge")
                         elif match[0] >= match[1] == 0 and match[2] > k: # if sequence a is first and overlap > k is at beginning of sequence b; or if they are perfect overlap
                                 # if need contigs to match
                                 # check if on same contig
@@ -125,8 +124,8 @@ def extend(uniques, contigID, k = 30): # if there's k (default = 30) characters 
                                         else:
                                                 extended.append((heada,seqa))
                                                 extended.append((headb,seqb))  
-                                                print("overlap but on different contigs, don't merge")
-                                                print(heada.split("_")[-1]+"\t"+headb.split("_")[-1])
+                                               # print("overlap but on different contigs, don't merge")
+                                               # print(heada.split("_")[-1]+"\t"+headb.split("_")[-1])
                                                 pass
                                 else: # if don't need to check if they're on the same contig
         #                               #print(seqa[:match[0]])
@@ -142,16 +141,16 @@ def extend(uniques, contigID, k = 30): # if there's k (default = 30) characters 
                                                 extended.append((headb+"_"+heada,merge)) # and save, with header of first sequence
                                                 #print("extended "+headb)
                                         else:
-                                                print("overlap but on different contigs, don't merge")
-                                                print(heada.split("_")[-1]+"\t"+headb.split("_")[-1])
+                                                #print("overlap but on different contigs, don't merge")
+                                                #print(heada.split("_")[-1]+"\t"+headb.split("_")[-1])
                                                 pass
                                 else:
-        #                               print(seqb[:match[0]])
+                                      # print(seqb[:match[0]])
                                         merge = seqb[:match[1]]+seqa # add a to first part of sequence b
                                         extended.append((headb+"_"+heada,merge)) # and save, with header of first sequence
                                         #print("extended "+headb)
                         elif match[2] < k: # if no match longer than k
-                                print("extended "+headb)
+                                #print("extended "+headb)
                                 #print("saved "+heada)
                                 extended.append((headb,seqb)) # save both individually
                                 #print("saved "+headb)
@@ -159,7 +158,7 @@ def extend(uniques, contigID, k = 30): # if there's k (default = 30) characters 
                                 extended.append((heada,seqa))
                                 #print("saved "+heada)
                                 extended.append((headb,seqb)) # save both individually
-                                print("saved "+headb)
+                                #print("saved "+headb)
                 else: # if one or both sequences are not longer than k
                         extended.append((heada,seqa))
                         #print("saved "+heada)
@@ -168,8 +167,8 @@ def extend(uniques, contigID, k = 30): # if there's k (default = 30) characters 
 #        extended_sorted = sorted(extended, key=lambda seq:seq[1])
         extended.sort(key=lambda t: len(t[1]))
         extended_sorted = extended
-        print(extended_sorted)
-        print([len(s[1]) for s in extended_sorted])
+       # print(extended_sorted)
+       # print([len(s[1]) for s in extended_sorted])
         return(extended_sorted)
 
 def save_unique(uniques,var_oriented):
@@ -207,19 +206,19 @@ def main(var, contigID = "yes"):
                 f.isFasta()
         #        print(f.sorted)
         #        print(f.headers)
-                print(f.sequences)
-                print(var)
+               # print(f.sequences)
+               # print(var)
                 uniques = is_dup(f.sequences,f.headers, contigID)
 #                extended = sorted(extend(uniques, contigID), key=lambda seq:len(seq[1]))
                 extended = extend(uniques, contigID)
-                print(extended)
+               # print(extended)
                 headers = [h[0] for h in extended]
-                print(len(headers))
+               # print(len(headers))
                 sequences = [s[1] for s in extended]
         #       print(len(sequences))
                 new_uniques = is_dup(sequences, headers, contigID)
                 save_unique(new_uniques,var_oriented)
-                print("done")
+               # print("done")
         else:
                 print("Can't orient sequences, file is empty or does not exist: "+var)
 
