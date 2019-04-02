@@ -270,7 +270,7 @@ def align(name,filename,querycsv):
                                 with open(name+"/"+name+"_aligned.out", "a") as al:
                                         al.write(name+"/"+name+'_'+genename+"_"+start[best]+"-"+stop[best]+"_"+contigs[0][0].split()[0]+'_align.out\n')
                         else:
-                              #  print("Merged sequences are from different contigs, need to extend separately on each side")
+                                print("Merged sequences are from different contigs, need to extend separately on each side")
         else:
                 print("Merged file does not exist, cannot align: "+filename)
 
