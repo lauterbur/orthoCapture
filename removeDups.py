@@ -28,6 +28,7 @@ class Fasta:
 
         def isFasta(self): ## check if it's a fasta file
                 if ">" == self.all_lines[0][0][0]:
+                        next
                        # print("Fasta file")
                 else:
                         print("Not a fasta file")
