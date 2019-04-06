@@ -420,7 +420,7 @@ def recBlast(fasta,gn,name,genome,ntloc):
                         print("blastn command line:")
                         print(blast_command_line)
 
-def par_recBlast(name,genome):
+def par_recBlast(name,genome,ntloc):
         num_cores = 20
 #        num_cores = multiprocessing.cpu_count()
         with open(name+'/'+name+'_fasta_tblastx.pickle', 'rb') as handle:
