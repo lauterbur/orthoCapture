@@ -23,6 +23,7 @@
 
 # The maximum reference sequence length for any given exon is 100000 nucleotides (set by pd.options.display.max_colwidth)
 # Fasta headers should not have underscores, dashes
+# Works best on exons < 1500 bp long, you may have to split up longer exons
 
 import sys
 import subprocess
@@ -204,7 +205,7 @@ def align(name,filename,querycsv):
                 ref.write(subject+"\n")
         if os.path.exists(name+"/"+name+"_"+genename+"_match_all_tblastx-merged.fasta"):
                 with open(name+"/"+name+"_"+genename+"_match_all_tblastx-merged.fasta", "r") as allfile:
-                        print("aligning "+name+"/"+name+"_"+genename+"_match_all_tblastx-merged.fasta")
+                        print("Aligning "+name+"/"+name+"_"+genename+"_match_all_tblastx-merged.fasta")
                         lines = allfile.readlines()
                         pairs = grouper(lines,2)
                         start=[]
@@ -269,7 +270,7 @@ def align(name,filename,querycsv):
                                 with open(name+"/"+name+"_aligned.out", "a") as al:
                                         al.write(name+"/"+name+'_'+genename+"_"+start[best]+"-"+stop[best]+"_"+contigs[0][0].split()[0]+'_align.out\n')
                         else:
-                                print("merged sequences are from different contigs, need to extend separately on each side")
+                                print("Merged sequences are from different contigs, need to extend separately on each side")
         else:
                 print("Merged file does not exist, cannot align: "+filename)
 
@@ -379,7 +380,7 @@ def tblastx(name,querycsv,query,genome):
                csv_to_fasta(querycsv,query)
         tblastx_command_line = 'ncbi-blast-2.2.29+/bin/tblastx -query '+query+' -db '+genome+' -culling_limit 1 -out '+name+'/'+name+'_tblastx.out -outfmt "6 qseqid qstart qend sstart send qcovhsp bitscore sacc" -max_target_seqs 1'
                 # using ncbi blast version 2.2.29 so sseq outputs nucleotide sequence (2.6.* outputs protein sequence)
-        print("tblastx command line:)
+        print("tblastx command line")
         print(tblastx_command_line)
         subprocess.Popen(tblastx_command_line, shell=True).wait() # shell because of argument in quotes, wait so script doesn't advance until done
                 # will output file [name]_tblastx.out
@@ -392,11 +393,11 @@ def tblastx(name,querycsv,query,genome):
         with open(name+'/'+name+'_fasta_tblastx.pickle', 'wb') as handle:
                 pickle.dump(fasta, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-def recBlast(fasta,gn,name,genome):
-        if ntloc="NONE":
+def recBlast(fasta,gn,name,genome,ntloc):
+        if ntloc=="NONE":
                 sys.exit("You didn't specify the location of your nucleotide database. Run prep_directory.sh <ntdb location> and try again from the recblast step.")
-        elif !os.path.isdir(ntloc):
-                sys.exit("The file you specified for the location of your nucleotide database doesn't exist. Check the path and run ntdb_location.sh <ntdb location> and try again from the recblast step.")
+        elif not os.path.isfile(ntloc+".nal"):
+                sys.exit("The file you specified for the location of your nucleotide database doesn't exist or there is no alias file. Check the path and run ntdb_location.sh <ntdb location> and try again from the recblast step.")
         else:
                 for x in range(len(fasta[gn])): # for each instance of that gene
                         filename = name+"/"+name+"_"+gn+"_"+fasta[gn][x][0]+'-'+fasta[gn][x][1]+"_tblastx.fa"
@@ -419,7 +420,7 @@ def recBlast(fasta,gn,name,genome):
                         print("blastn command line:")
                         print(blast_command_line)
 
-def par_recBlast(name,genome):
+def par_recBlast(name,genome,ntloc):
         num_cores = 20
 #        num_cores = multiprocessing.cpu_count()
         with open(name+'/'+name+'_fasta_tblastx.pickle', 'rb') as handle:
@@ -464,12 +465,12 @@ def main():
         # Define ntloc
         ntloc = '/test/test/path'
         if skip == "noskip":
-                if !os.path.isdir(name):
+                if not os.path.isdir(name):
                         os.makedirs(name) # make a directory for all of the files
                 else:
                         print(name+" directory already exists")
                 tblastx(name,querycsv,query,genome)
-                par_recBlast(name,genome)
+                par_recBlast(name,genome,ntloc)
                 par_blastMatch(name,querycsv)
                 collapse(name,querycsv)
                 with open(name+"/"+name+"_amended.out","r") as am:
@@ -484,7 +485,7 @@ def main():
                 for i in aligned:
                         extend(name, i, querycsv, genome)
         if skip == "tblastx":
-                if !os.path.isdir(name):
+                if not os.path.isdir(name):
                         os.makedirs(name) # make a directory for all of the files
                 else:
                         print(name+" directory already exists")
@@ -492,54 +493,54 @@ def main():
                 print("tblastx step complete. go to recblast.")
                 sys.exit("tblastx step complete. go to recblast.")
         if skip == "recblast":
-                par_recBlast(name,genome)
+                par_recBlast(name,genome,ntloc)
                 print("recblast step complete. go to blastmatch.")
                 sys.exit("recblast step complete. go to blastmatch.")
-                par_blastMatch(name,querycsv)
-                collapse(name,querycsv)
-                with open(name+"/"+name+"_amended.out","r") as am:
-                        already=am.read().splitlines()
-                with open(name+"/"+name+"_amended.out","r") as am:
-                        already=am.read().splitlines()
-                for i in already:
-                        if os.path.exists(i):
-                                align(name, i, querycsv)
-                with open(name+"/"+name+"_aligned.out","r") as al:
-                        aligned=al.read().splitlines()
-                for i in aligned:
-                        extend(name, i, querycsv, genome)
+           #     par_blastMatch(name,querycsv)
+           #     collapse(name,querycsv)
+           #     with open(name+"/"+name+"_amended.out","r") as am:
+           #             already=am.read().splitlines()
+           #     with open(name+"/"+name+"_amended.out","r") as am:
+           #             already=am.read().splitlines()
+           #     for i in already:
+           #             if os.path.exists(i):
+           #                     align(name, i, querycsv)
+           #     with open(name+"/"+name+"_aligned.out","r") as al:
+           #             aligned=al.read().splitlines()
+           #     for i in aligned:
+           #             extend(name, i, querycsv, genome)
         if skip == "blastmatch":
                 par_blastMatch(name,querycsv)
                 print("blastmatch step complete. go to collapse.")
                 sys.exit("blastmatch step complete. go to collapse.")
-                collapse(name,querycsv)
-                with open(name+"/"+name+"_amended.out","r") as am:
-                        already=am.read().splitlines()
-                with open(name+"/"+name+"_amended.out","r") as am:
-                        already=am.read().splitlines()
-                for i in already:
-                        if os.path.exists(i):
-                                align(name, i, querycsv)
-                with open(name+"/"+name+"_aligned.out","r") as al:
-                        aligned=al.read().splitlines()
-                for i in aligned:
-                        extend(name, i, querycsv, genome)
-                sys.exit()
+            #    collapse(name,querycsv)
+            #    with open(name+"/"+name+"_amended.out","r") as am:
+            #            already=am.read().splitlines()
+            #    with open(name+"/"+name+"_amended.out","r") as am:
+            #            already=am.read().splitlines()
+            #    for i in already:
+            #            if os.path.exists(i):
+            #                    align(name, i, querycsv)
+            #    with open(name+"/"+name+"_aligned.out","r") as al:
+            #            aligned=al.read().splitlines()
+            #    for i in aligned:
+            #            extend(name, i, querycsv, genome)
+            #    sys.exit()
         if skip == "collapse":
                 collapse(name,querycsv)
                 print("collapse step complete. go to align.")
                 sys.exit("collapse step complete. go to align.")
-                with open(name+"/"+name+"_amended.out","r") as am:
-                        already=am.read().splitlines()
-                with open(name+"/"+name+"_amended.out","r") as am:
-                        already=am.read().splitlines()
-                for i in already:
-                        if os.path.exists(i):
-                                align(name, i, querycsv)
-                with open(name+"/"+name+"_aligned.out","r") as al:
-                        aligned=al.read().splitlines()
-                for i in aligned:
-                        extend(name, i, querycsv, genome)
+             #   with open(name+"/"+name+"_amended.out","r") as am:
+             #           already=am.read().splitlines()
+             #   with open(name+"/"+name+"_amended.out","r") as am:
+             #           already=am.read().splitlines()
+             #   for i in already:
+             #           if os.path.exists(i):
+             #                   align(name, i, querycsv)
+             #   with open(name+"/"+name+"_aligned.out","r") as al:
+             #           aligned=al.read().splitlines()
+             #   for i in aligned:
+             #           extend(name, i, querycsv, genome)
         if skip == "align":
                 with open(name+"/"+name+"_amended.out","r") as am:
                         already=am.read().splitlines()
@@ -548,10 +549,10 @@ def main():
                                 align(name, i, querycsv)
                 print("align step complete. go to extend.")
                 sys.exit("align step complete. go to extend.")
-                with open(name+"/"+name+"_aligned.out","r") as al:
-                        aligned=al.read().splitlines()
-                for i in aligned:
-                        extend(name, i, querycsv, genome)
+             #   with open(name+"/"+name+"_aligned.out","r") as al:
+             #           aligned=al.read().splitlines()
+             #   for i in aligned:
+             #           extend(name, i, querycsv, genome)
         if skip == "extend":
                 with open(name+"/"+name+"_aligned.out","r") as al:
                         aligned=al.read().splitlines()
